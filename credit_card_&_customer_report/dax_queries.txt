@@ -1,0 +1,35 @@
+Revenue_measure = SUMX('powerbiproject cc_detail','powerbiproject cc_detail'[Annual_Fees]+'powerbiproject cc_detail'[Total_Trans_Amt]+'powerbiproject cc_detail'[Interest_Earned])
+
+Revenue = 'powerbiproject cc_detail'[Annual_Fees]+'powerbiproject cc_detail'[Interest_Earned]+'powerbiproject cc_detail'[Total_Trans_Amt]
+
+WeekNumber = WEEKNUM('powerbiproject cc_detail'[Week_Start_Date])
+
+
+
+Income group = SWITCH(TRUE(),
+'powerbiproject cust_detail'[Income] <40000,"low",
+'powerbiproject cust_detail'[Income] >= 40000 && 'powerbiproject cust_detail'[Income] <=70000,"Medium",
+'powerbiproject cust_detail'[Income] >=70000,"High")
+
+Age Group = SWITCH(TRUE(),
+'powerbiproject cust_detail'[Customer_Age] <30,"20-30",
+'powerbiproject cust_detail'[Customer_Age] >=30 && 'powerbiproject cust_detail'[Customer_Age] <40,"30-40",
+'powerbiproject cust_detail'[Customer_Age] >=40 && 'powerbiproject cust_detail'[Customer_Age] <50,"40-50",
+'powerbiproject cust_detail'[Customer_Age] >=50 && 'powerbiproject cust_detail'[Customer_Age] <60,"50-60",
+'powerbiproject cust_detail'[Customer_Age] >=60 && 'powerbiproject cust_detail'[Customer_Age] <70,"60-70",
+'powerbiproject cust_detail'[Customer_Age] >=70,"70+"
+)
+
+previous_week_revenue = CALCULATE(
+    sum('powerbiproject cc_detail'[Revenue]),
+    FILTER(ALL('powerbiproject cc_detail'),
+    'powerbiproject cc_detail'[WeekNumber] = MAX('powerbiproject cc_detail'[WeekNumber])-1))
+
+current_week_revenue = CALCULATE(
+    sum('powerbiproject cc_detail'[Revenue]),
+    FILTER(ALL('powerbiproject cc_detail'),
+    'powerbiproject cc_detail'[WeekNumber] = MAX('powerbiproject cc_detail'[WeekNumber])))
+
+week_over_week_revenue = DIVIDE([current_week_revenue]-[previous_week_revenue],[previous_week_revenue])
+
+WeekNumber = WEEKNUM('powerbiproject cc_detail'[Week_Start_Date])
